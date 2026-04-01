@@ -7,13 +7,13 @@ variable "hetzner_api_token" {
 variable "ssh_public_key_path" {
   description = "Path to SSH public key"
   type        = string
-  default     = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/homelab.pub"
 }
 
 variable "location" {
   description = "Hetzner datacenter location"
   type        = string
-  default     = "fsn1" # Falkenstein
+  default     = "nbg1" # Falkenstein
 }
 
 variable "server_name" {
@@ -25,5 +25,5 @@ variable "server_name" {
 variable "server_type" {
   description = "Hetzner server type"
   type        = string
-  default     = "cpx21" # 3 vCPU, 4GB RAM
+  default     = "cpx22"
 }
