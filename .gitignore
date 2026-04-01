@@ -1,0 +1,23 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.auto.tfvars
+
+# Ansible
+*.retry
+*.vault-pass
+.vault-password
+
+# Kubernetes
+kubeconfig
+*.secret.yaml
+secrets/
+
+# Misc
+.env
+*.pem
+*.key
+.DS_Store
