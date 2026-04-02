@@ -1,0 +1,73 @@
+---
+- name: Install ArgoCD
+  hosts: homelab
+  become: true
+
+  vars:
+    argocd_version: "v2.14.5"
+    argocd_namespace: argocd
+    kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+
+  tasks:
+    - name: Create argocd namespace
+      ansible.builtin.command:
+        cmd: k3s kubectl create namespace {{ argocd_namespace }}
+      register: ns_create
+      failed_when: ns_create.rc != 0 and 'already exists' not in ns_create.stderr
+      changed_when: ns_create.rc == 0
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+
+    - name: Apply ArgoCD manifests
+      ansible.builtin.command:
+        cmd: >
+          k3s kubectl apply -n {{ argocd_namespace }}
+          -f https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      changed_when: true
+
+    - name: Wait for ArgoCD server deployment
+      ansible.builtin.command:
+        cmd: >
+          k3s kubectl rollout status deployment/argocd-server
+          -n {{ argocd_namespace }} --timeout=300s
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      changed_when: false
+
+    - name: Wait for ArgoCD application controller
+      ansible.builtin.command:
+        cmd: >
+          k3s kubectl rollout status statefulset/argocd-application-controller
+          -n {{ argocd_namespace }} --timeout=300s
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      changed_when: false
+
+    - name: Get ArgoCD initial admin password
+      ansible.builtin.command:
+        cmd: >
+          k3s kubectl -n {{ argocd_namespace }} get secret argocd-initial-admin-secret
+          -o jsonpath={.data.password}
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: argocd_password_b64
+      changed_when: false
+
+    - name: Decode password
+      ansible.builtin.command:
+        cmd: bash -c "echo '{{ argocd_password_b64.stdout }}' | base64 -d"
+      register: argocd_password
+      changed_when: false
+      delegate_to: localhost
+      become: false
+
+    - name: Print ArgoCD access info
+      ansible.builtin.debug:
+        msg:
+          - "ArgoCD is ready!"
+          - "Username: admin"
+          - "Password: {{ argocd_password.stdout }}"
+          - "Access via: kubectl port-forward -n argocd svc/argocd-server 8080:443"
+          - "Then open: https://localhost:8080"

@@ -1,0 +1,40 @@
+deployment:
+  replicas: 1
+
+service:
+  type: LoadBalancer
+
+ports:
+  web:
+    port: 80
+    exposedPort: 80
+  websecure:
+    port: 443
+    exposedPort: 443
+    tls:
+      enabled: true
+
+ingressRoute:
+  dashboard:
+    enabled: false  # exposed via IngressRoute with auth later
+
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: robs@robschwe.de
+      storage: /data/acme.json
+      httpChallenge:
+        entryPoint: web
+
+persistence:
+  enabled: true
+  size: 128Mi
+
+globalArguments:
+  - "--global.sendanonymoususage=false"

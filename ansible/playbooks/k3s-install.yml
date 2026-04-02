@@ -1,0 +1,73 @@
+---
+- name: Install K3s
+  hosts: homelab
+  become: true
+
+  vars:
+    k3s_version: "v1.32.3+k3s1"
+    k3s_install_args: "--disable traefik --disable servicelb --write-kubeconfig-mode 644"
+    kubeconfig_local_path: "~/.kube/homelab.yaml"
+
+  tasks:
+    - name: Update apt cache and upgrade packages
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+        cache_valid_time: 3600
+
+    - name: Install required dependencies
+      ansible.builtin.apt:
+        name:
+          - curl
+          - ca-certificates
+          - apt-transport-https
+        state: present
+
+    - name: Download K3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: "0755"
+
+    - name: Install K3s
+      ansible.builtin.command:
+        cmd: /tmp/k3s-install.sh
+        creates: /usr/local/bin/k3s
+      environment:
+        INSTALL_K3S_VERSION: "{{ k3s_version }}"
+        INSTALL_K3S_EXEC: "{{ k3s_install_args }}"
+
+    - name: Wait for K3s to be ready
+      ansible.builtin.command: k3s kubectl get nodes
+      register: k3s_nodes
+      retries: 10
+      delay: 10
+      until: k3s_nodes.rc == 0
+      changed_when: false
+
+    - name: Fetch kubeconfig from server
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ kubeconfig_local_path }}"
+        flat: true
+
+    - name: Replace localhost with server IP in kubeconfig
+      ansible.builtin.replace:
+        path: "{{ kubeconfig_local_path }}"
+        regexp: "127\\.0\\.0\\.1"
+        replace: "{{ ansible_host }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Set kubeconfig file permissions
+      ansible.builtin.file:
+        path: "{{ kubeconfig_local_path }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+
+    - name: Print success message
+      ansible.builtin.debug:
+        msg: >
+          K3s installed successfully.
+          Use: export KUBECONFIG={{ kubeconfig_local_path }}
