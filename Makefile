@@ -1,6 +1,6 @@
 .PHONY: help setup check fix \
 		ssh-keygen ssh-login terraform \
-		tf-plan tf-up tf-down \
+		tf-plan tf-up tf-down dns-zone-create \
 		ansible-k3s ansible-argocd argocd-pw argocd-ui
 
 -include .env
@@ -28,6 +28,7 @@ help:
 	@echo "		tf-plan  	- Plan Terraform changes"
 	@echo "		tf-up    	- Apply Terraform changes"
 	@echo "		tf-down  	- Destroy Terraform changes"
+	@echo "		dns-zone-create - Bootstrap Hetzner DNS zone (run once)"
 	@echo ""
 	@echo "Ansible commands"
 	@echo "		ansible-k3s 	- Install K3s on server"
@@ -69,15 +70,17 @@ ssh-login:
 
 # Terraform
 
+TF_VARS := TF_VAR_hetzner_api_token=$$HETZNER_API_TOKEN
+
 tf-plan:
-	TF_VAR_hetzner_api_token=$$HETZNER_API_TOKEN terraform -chdir=$(TERRAFORM_DIR) plan
+	$(TF_VARS) terraform -chdir=$(TERRAFORM_DIR) plan
 
 tf-up:
-	TF_VAR_hetzner_api_token=$$HETZNER_API_TOKEN terraform -chdir=$(TERRAFORM_DIR) apply -auto-approve
+	terraform -chdir=$(TERRAFORM_DIR) init -upgrade -input=false
+	$(TF_VARS) terraform -chdir=$(TERRAFORM_DIR) apply -auto-approve
 
 tf-down:
-	TF_VAR_hetzner_api_token=$$HETZNER_API_TOKEN terraform -chdir=$(TERRAFORM_DIR) destroy
-
+	$(TF_VARS) terraform -chdir=$(TERRAFORM_DIR) destroy
 
 
 # Ansible

@@ -12,8 +12,44 @@ spec:
     chart: traefik
     targetRevision: "34.x"
     helm:
-      valueFiles:
-        - values.yaml
+      values: |
+        service:
+          type: LoadBalancer
+
+        ports:
+          web:
+            port: 80
+            exposedPort: 80
+          websecure:
+            port: 443
+            exposedPort: 443
+            tls:
+              enabled: true
+
+        ingressRoute:
+          dashboard:
+            enabled: false
+
+        providers:
+          kubernetesCRD:
+            enabled: true
+          kubernetesIngress:
+            enabled: true
+
+        certificatesResolvers:
+          letsencrypt:
+            acme:
+              email: robs@robschwe.de
+              storage: /data/acme.json
+              httpChallenge:
+                entryPoint: web
+
+        persistence:
+          enabled: true
+          size: 128Mi
+
+        globalArguments:
+          - "--global.sendanonymoususage=false"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik

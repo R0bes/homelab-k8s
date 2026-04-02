@@ -12,9 +12,9 @@ spec:
     chart: cert-manager
     targetRevision: "v1.17.x"
     helm:
-      parameters:
-        - name: crds.enabled
-          value: "true"
+      values: |
+        crds:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager

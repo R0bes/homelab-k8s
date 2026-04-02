@@ -5,7 +5,7 @@
 
   vars:
     k3s_version: "v1.32.3+k3s1"
-    k3s_install_args: "--disable traefik --disable servicelb --write-kubeconfig-mode 644"
+    k3s_install_args: "--disable traefik --write-kubeconfig-mode 644"
     kubeconfig_local_path: "~/.kube/homelab.yaml"
 
   tasks:
