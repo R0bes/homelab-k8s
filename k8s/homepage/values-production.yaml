@@ -1,0 +1,31 @@
+# Production / homelab-k8s cluster.
+#
+# Operator checklist (not automated):
+# - Create Secret homepage-content-git in namespace homepage before first sync (see secret-homepage-content-git.example.yaml).
+# - Point DNS for ingress.host (and demo embed hosts) at the Traefik LoadBalancer IP when cutting over.
+
+ingress:
+  host: robschwe.de
+  # HTTP-01 challenge uses web; HTTPS uses websecure (Traefik ACME in k8s/traefik/helmrelease.yaml).
+  entrypoints: web,websecure
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+middleware:
+  cacheControlNoStore:
+    enabled: true
+
+content:
+  root: /data/content
+  git:
+    enabled: true
+    existingSecret: homepage-content-git
+
+demoEmbeds:
+  - slug: 11_fourierfun
+    host: fourierfun.robschwe.de
+  - slug: 13_shaderplayground
+    host: shaderplayground.robschwe.de
+  - slug: 14_homepage
+    host: robschwe.de

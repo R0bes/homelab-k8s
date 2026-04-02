@@ -1,0 +1,21 @@
+# Local KIND — merge after values.yaml (Argo: valueFiles order).
+
+content:
+  root: /data/content
+  git:
+    enabled: true
+    existingSecret: homepage-content-git
+
+ingress:
+  host: rob.schwe.local
+  tls:
+    enabled: true
+    secretName: local-dev-tls
+
+demoEmbeds:
+  - slug: 11_fourierfun
+    host: fourierfun.rob.schwe.local
+  - slug: 13_shaderplayground
+    host: shaderplayground.rob.schwe.local
+  - slug: 14_homepage
+    host: rob.schwe.local

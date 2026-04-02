@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+{{- $git := .Values.content.git | default dict }}
+{{- $gitEnabled := $git.enabled | default false }}
+{{- $contentRoot := .Values.content.root | default "" | trim }}
+{{- if and $gitEnabled (eq $contentRoot "") }}
+{{-   $contentRoot = "/data/content" }}
+{{- end }}
+{{- $mountContent := or $gitEnabled (ne $contentRoot "") }}
+{{- if $gitEnabled }}
+      initContainers:
+        - name: content-git-sync
+          image: {{ $git.image | default "alpine/git:v2.47.2" | quote }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              mkdir -p "${CONTENT_ROOT}"
+              find "${CONTENT_ROOT}" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
+              REPO="${GIT_REPO}"
+              if [ -n "${GITHUB_TOKEN:-}" ]; then
+                case "${GIT_REPO}" in
+                  https://*) REPO="https://x-access-token:${GITHUB_TOKEN}@${GIT_REPO#https://}" ;;
+                  *) REPO="${GIT_REPO}" ;;
+                esac
+              fi
+              git clone --depth 1 --branch "${GIT_REF}" "${REPO}" /tmp/gitc
+              cp -a /tmp/gitc/. "${CONTENT_ROOT}/"
+              rm -rf "${CONTENT_ROOT}/.git"
+          env:
+            - name: CONTENT_ROOT
+              value: {{ $contentRoot | quote }}
+            - name: GIT_REPO
+              value: {{ $git.repo | quote }}
+            - name: GIT_REF
+              value: {{ $git.ref | default "main" | quote }}
+{{- if $git.existingSecret }}
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $git.existingSecret | quote }}
+                  key: {{ $git.existingSecretKey | default "token" | quote }}
+{{- end }}
+          volumeMounts:
+            - name: content-root
+              mountPath: {{ $contentRoot | quote }}
+{{- end }}
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.app.service.port }}
+          {{ $scheme := .Values.url.scheme | default "https" }}
+          {{ $demoUrls := dict }}
+          {{ range .Values.demoEmbeds }}
+          {{ $_ := set $demoUrls .slug (printf "%s://%s" $scheme .host) }}
+          {{ end }}
+          env:
+            - name: SITE_URL
+              value: '{{ printf "%s://%s" $scheme .Values.ingress.host }}'
+            - name: DEMO_PROJECT_URLS_JSON
+              value: '{{ $demoUrls | toJson }}'
+{{- if index $demoUrls "11_fourierfun" }}
+            - name: DEMO_FOURIERFUN_URL
+              value: '{{ index $demoUrls "11_fourierfun" }}'
+{{- end }}
+{{- if $mountContent }}
+            - name: CONTENT_ROOT
+              value: {{ $contentRoot | quote }}
+{{- end }}
+{{- if $mountContent }}
+          volumeMounts:
+            - name: content-root
+              mountPath: {{ $contentRoot | quote }}
+{{- end }}
+{{- if $mountContent }}
+      volumes:
+        - name: content-root
+          emptyDir: {}
+{{- end }}

@@ -1,0 +1,40 @@
+namespace: homepage
+
+app:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/r0bes/homepage
+    tag: latest
+    pullPolicy: Always
+  service:
+    port: 3000
+
+ingress:
+  enabled: true
+  className: traefik
+  host: example.invalid
+  entrypoints: websecure
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+
+# Next.js: optional Traefik Middleware to avoid stale client bundles vs new image (matches docker-compose nocache).
+middleware:
+  cacheControlNoStore:
+    enabled: false
+
+url:
+  scheme: https
+
+demoEmbeds: []
+
+content:
+  root: ""
+  git:
+    enabled: false
+    repo: https://github.com/R0bes/homepage-content.git
+    ref: main
+    image: alpine/git:v2.47.2
+    existingSecret: ""
+    existingSecretKey: token

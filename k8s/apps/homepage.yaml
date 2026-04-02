@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homepage
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd-image-updater.argoproj.io/image-list: homepage=ghcr.io/r0bes/homepage
+    argocd-image-updater.argoproj.io/homepage.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/homepage.allow-tags: regexp:^sha-
+    argocd-image-updater.argoproj.io/homepage.helm.image-name: app.image.repository
+    argocd-image-updater.argoproj.io/homepage.helm.image-tag: app.image.tag
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/R0bes/homelab-k8s.git
+    targetRevision: HEAD
+    path: k8s/homepage
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-production.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homepage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
