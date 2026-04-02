@@ -11,6 +11,8 @@ app:
 
 ingress:
   host: robschwe.de
+  # Must match cluster IngressClass (Traefik Helm release uses traefik-helm).
+  className: traefik-helm
   # HTTP-01 challenge uses web; HTTPS uses websecure (Traefik ACME in k8s/traefik/helmrelease.yaml).
   entrypoints: web,websecure
   annotations:
