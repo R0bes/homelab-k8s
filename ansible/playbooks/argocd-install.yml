@@ -63,11 +63,20 @@
       delegate_to: localhost
       become: false
 
+    - name: Apply GitOps root app
+      ansible.builtin.command:
+        cmd: >
+          k3s kubectl apply -f
+          https://raw.githubusercontent.com/R0bes/homelab-k8s/main/k8s/apps/root-app.yaml
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      changed_when: true
+
     - name: Print ArgoCD access info
       ansible.builtin.debug:
         msg:
           - "ArgoCD is ready!"
           - "Username: admin"
           - "Password: {{ argocd_password.stdout }}"
-          - "Access via: kubectl port-forward -n argocd svc/argocd-server 8080:443"
-          - "Then open: https://localhost:8080"
+          - "ArgoCD UI: https://argocd.robschwe.de (after DNS propagation)"
+          - "Or local: kubectl port-forward -n argocd svc/argocd-server 8080:443"
