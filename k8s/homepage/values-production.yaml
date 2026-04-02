@@ -1,8 +1,13 @@
 # Production / homelab-k8s cluster.
 #
 # Operator checklist (not automated):
-# - Create Secret homepage-content-git in namespace homepage before first sync (see secret-homepage-content-git.example.yaml).
+# - Secret homepage-content-git (GitHub PAT for private homepage-content clone).
+# - Secret ghcr-pull (docker-registry for ghcr.io if the app image is private): same PAT often works with username R0bes.
 # - Point DNS for ingress.host (and demo embed hosts) at the Traefik LoadBalancer IP when cutting over.
+
+app:
+  imagePullSecrets:
+    - name: ghcr-pull
 
 ingress:
   host: robschwe.de

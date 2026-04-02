@@ -2,6 +2,8 @@ namespace: homepage
 
 app:
   replicaCount: 1
+  # For private ghcr.io images (e.g. ghcr-pull from docker-registry secret).
+  imagePullSecrets: []
   image:
     repository: ghcr.io/r0bes/homepage
     tag: latest

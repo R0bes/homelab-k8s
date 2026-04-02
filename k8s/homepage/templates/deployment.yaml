@@ -13,6 +13,10 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+{{- with .Values.app.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+{{- end }}
 {{- $git := .Values.content.git | default dict }}
 {{- $gitEnabled := $git.enabled | default false }}
 {{- $contentRoot := .Values.content.root | default "" | trim }}
