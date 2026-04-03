@@ -1,0 +1,65 @@
+# Forward auth to oauth2-proxy (Keycloak OIDC). One middleware per protected host.
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: forward-auth-oauth2-homer
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy-homer.auth.svc.cluster.local:4180/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Access-Token
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: forward-auth-oauth2-fourierfun
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy-fourierfun.auth.svc.cluster.local:4180/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Access-Token
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: forward-auth-oauth2-shaderplayground
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy-shaderplayground.auth.svc.cluster.local:4180/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Access-Token
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: forward-auth-oauth2-prometheus
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy-prometheus.auth.svc.cluster.local:4180/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Access-Token

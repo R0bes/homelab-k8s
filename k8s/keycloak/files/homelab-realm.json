@@ -1,0 +1,55 @@
+{
+  "realm": "homelab",
+  "enabled": true,
+  "displayName": "Homelab",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "clients": [
+    {
+      "clientId": "homelab-edge",
+      "name": "oauth2-proxy",
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "https://homer.robschwe.de/oauth2/callback",
+        "https://fourierfun.robschwe.de/oauth2/callback",
+        "https://shaderplayground.robschwe.de/oauth2/callback",
+        "https://prometheus.robschwe.de/oauth2/callback"
+      ],
+      "webOrigins": ["+"],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "grafana",
+      "name": "Grafana",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${GRAFANA_CLIENT_SECRET}",
+      "redirectUris": ["https://grafana.robschwe.de/login/generic_oauth"],
+      "webOrigins": ["https://grafana.robschwe.de"],
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "argocd",
+      "name": "Argo CD",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${ARGOCD_CLIENT_SECRET}",
+      "redirectUris": ["https://argocd.robschwe.de/auth/callback"],
+      "webOrigins": ["https://argocd.robschwe.de"],
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false
+    }
+  ]
+}

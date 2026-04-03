@@ -1,0 +1,28 @@
+# One Deployment + Service + Ingress per entry (namespace auth).
+issuer: https://auth.robschwe.de/realms/homelab
+clientId: homelab-edge
+
+proxies:
+  - name: homer
+    host: homer.robschwe.de
+    cookieName: _oauth2_homer
+  - name: fourierfun
+    host: fourierfun.robschwe.de
+    cookieName: _oauth2_fourierfun
+  - name: shaderplayground
+    host: shaderplayground.robschwe.de
+    cookieName: _oauth2_shaderplayground
+  - name: prometheus
+    host: prometheus.robschwe.de
+    cookieName: _oauth2_prometheus
+
+image:
+  repository: quay.io/oauth2-proxy/oauth2-proxy
+  tag: v7.7.1
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    memory: 128Mi

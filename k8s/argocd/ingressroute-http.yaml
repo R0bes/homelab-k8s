@@ -7,12 +7,6 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`argocd.robschwe.de`) && PathPrefix(`/outpost.goauthentik.io`)
-      priority: 100
-      kind: Rule
-      services:
-        - name: authentik-outpost
-          port: 9000
     - match: Host(`argocd.robschwe.de`)
       priority: 1
       kind: Rule

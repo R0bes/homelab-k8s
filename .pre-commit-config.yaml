@@ -5,7 +5,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        exclude: ^k8s/homepage/templates/
+        exclude: ^k8s/homepage/templates/|^k8s/keycloak/templates/|^k8s/oauth2-proxy/templates/|\.example\.yaml$|^k8s/traefik/middleware-forward-auth-oauth2\.yaml$
       - id: check-added-large-files
         exclude: ^k8s/.+/charts/.+\.tgz$
       - id: check-merge-conflict

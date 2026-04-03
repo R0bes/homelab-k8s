@@ -1,5 +1,6 @@
 # Overrides for dependency kube-prometheus-stack (see Chart.yaml).
 # Grafana admin password is generated into a Secret by the Grafana subchart (retrieve after install if needed).
+# Create Secret grafana-oauth in namespace monitoring with key client-secret (same value as Keycloak grafana client).
 
 kube-prometheus-stack:
   fullnameOverride: ""
@@ -29,6 +30,21 @@ kube-prometheus-stack:
       server:
         domain: grafana.robschwe.de
         root_url: https://grafana.robschwe.de/
+    env:
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: Keycloak
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: grafana
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid email profile
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://auth.robschwe.de/realms/homelab/protocol/openid-connect/auth
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://auth.robschwe.de/realms/homelab/protocol/openid-connect/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://auth.robschwe.de/realms/homelab/protocol/openid-connect/userinfo
+      GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
+    envValueFrom:
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+        secretKeyRef:
+          name: grafana-oauth
+          key: client-secret
     ingress:
       enabled: true
       ingressClassName: traefik-helm
@@ -39,7 +55,6 @@ kube-prometheus-stack:
         traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
-        traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-authentik@kubernetescrd
         traefik.ingress.kubernetes.io/router.priority: "1"
     persistence:
       enabled: true
@@ -62,7 +77,7 @@ kube-prometheus-stack:
         traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
-        traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-authentik@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-oauth2-prometheus@kubernetescrd
         traefik.ingress.kubernetes.io/router.priority: "1"
     prometheusSpec:
       externalUrl: https://prometheus.robschwe.de

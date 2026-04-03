@@ -1,0 +1,56 @@
+# Bitnami subchart values (dependency name: keycloak).
+# Bootstrap: Secret keycloak-admin (admin-password) and keycloak-config-cli-env (GRAFANA_CLIENT_SECRET, ARGOCD_CLIENT_SECRET).
+# See secret-bootstrap.example.yaml and ansible/playbooks/keycloak-bootstrap-secrets.yml.
+
+keycloak:
+  global:
+    security:
+      allowInsecureImages: true
+
+  auth:
+    adminUser: admin
+    existingSecret: keycloak-admin
+    passwordSecretKey: admin-password
+
+  production: false
+  proxyHeaders: xforwarded
+  hostnameStrict: true
+
+  tls:
+    enabled: false
+
+  cache:
+    enabled: false
+
+  ingress:
+    enabled: true
+    hostname: auth.robschwe.de
+    ingressClassName: traefik-helm
+    path: /
+    pathType: Prefix
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    tls: false
+
+  postgresql:
+    enabled: true
+    auth:
+      username: bn_keycloak
+      database: bitnami_keycloak
+
+  keycloakConfigCli:
+    enabled: true
+    existingConfigmap: keycloak-realm-import
+    extraEnvVars:
+      - name: IMPORT_VARSUBSTITUTION_ENABLED
+        value: "true"
+    extraEnvVarsSecret: keycloak-config-cli-env
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1536Mi

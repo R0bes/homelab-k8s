@@ -1,0 +1,20 @@
+{{- range .Values.proxies }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ops.fullname" . }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: oauth2-proxy
+    app.kubernetes.io/instance: {{ .name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 4180
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: oauth2-proxy
+    app.kubernetes.io/instance: {{ .name }}
+{{- end }}

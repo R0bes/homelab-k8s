@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: authentik
+  name: keycloak
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "12"
@@ -12,13 +12,13 @@ spec:
   source:
     repoURL: https://github.com/R0bes/homelab-k8s.git
     targetRevision: HEAD
-    path: k8s/authentik
+    path: k8s/keycloak
     helm:
       valueFiles:
         - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: authentik
+    namespace: auth
   syncPolicy:
     automated:
       prune: true

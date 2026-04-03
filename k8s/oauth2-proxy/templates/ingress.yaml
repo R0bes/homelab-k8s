@@ -1,8 +1,10 @@
+{{- range .Values.proxies }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: authentik-outpost-path
-  namespace: homer
+  name: {{ include "ops.fullname" . }}-oauth2
+  namespace: {{ $.Release.Namespace }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
@@ -11,13 +13,14 @@ metadata:
 spec:
   ingressClassName: traefik-helm
   rules:
-    - host: homer.robschwe.de
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: /outpost.goauthentik.io
+          - path: /oauth2
             pathType: Prefix
             backend:
               service:
-                name: authentik-outpost
+                name: {{ include "ops.fullname" . }}
                 port:
-                  number: 9000
+                  number: 4180
+{{- end }}

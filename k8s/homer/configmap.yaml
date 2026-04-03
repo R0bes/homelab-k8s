@@ -26,7 +26,7 @@ data:
             url: https://argocd.robschwe.de
       - name: Auth
         items:
-          - name: Authentik
+          - name: Keycloak
             icon: fas fa-user-shield
             url: https://auth.robschwe.de
       - name: Observability

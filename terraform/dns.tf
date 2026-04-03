@@ -20,3 +20,5 @@ resource "hcloud_zone_rrset" "wildcard" {
     { value = hcloud_server.homelab.ipv4_address }
   ]
 }
+
+# Wildcard covers auth.robschwe.de (Keycloak), grafana.*, argocd.*, etc. No extra RRset required for auth.
