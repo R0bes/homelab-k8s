@@ -29,7 +29,7 @@ IaC for my personal cloud platform.
 
 ### Auth (Keycloak + oauth2-proxy)
 
-1. Bootstrap secrets (see [k8s/keycloak/secret-bootstrap.example.yaml](k8s/keycloak/secret-bootstrap.example.yaml) or run [ansible/playbooks/keycloak-bootstrap-secrets.yml](ansible/playbooks/keycloak-bootstrap-secrets.yml)).
+1. Bootstrap secrets from a host that can reach the cluster: [scripts/bootstrap-keycloak-auth.sh](scripts/bootstrap-keycloak-auth.sh) (uses `KUBECONFIG`, default `~/.kube/homelab.yaml`). Alternatives: [k8s/keycloak/secret-bootstrap.example.yaml](k8s/keycloak/secret-bootstrap.example.yaml) or [ansible/playbooks/keycloak-bootstrap-secrets.yml](ansible/playbooks/keycloak-bootstrap-secrets.yml).
 2. Let Argo CD sync `keycloak` (wave 12) then `oauth2-proxy` (wave 13).
 3. After changing Argo OIDC client secret, restart: `kubectl rollout restart deployment/argocd-server -n argocd`.
 
