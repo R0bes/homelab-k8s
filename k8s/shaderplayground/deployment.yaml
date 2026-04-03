@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shaderplayground
+  namespace: shaderplayground
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shaderplayground
+  template:
+    metadata:
+      labels:
+        app: shaderplayground
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: shaderplayground
+          image: ghcr.io/r0bes/shaderplayground:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
