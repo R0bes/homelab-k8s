@@ -1,5 +1,7 @@
 # Subchart values (dependency name: authentik).
-# Chart creates authentik + PostgreSQL secrets on install (no manual bootstrap Secret required).
+# Required once: Secret `authentik-bootstrap` with AUTHENTIK_SECRET_KEY (see secret-bootstrap.example.yaml).
+# Chart omits AUTHENTIK_SECRET_KEY from the generated Secret when secret_key is empty; inject via global.env.
+# PostgreSQL password is managed by the chart (Secret authentik-postgresql); do not duplicate it in bootstrap.
 
 authentik:
   global:
@@ -7,6 +9,12 @@ authentik:
       podAntiAffinity: none
       nodeAffinity:
         type: none
+    env:
+      - name: AUTHENTIK_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: authentik-bootstrap
+            key: AUTHENTIK_SECRET_KEY
 
   postgresql:
     enabled: true
