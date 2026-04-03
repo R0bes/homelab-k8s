@@ -1,0 +1,14 @@
+# Routes /outpost.goauthentik.io on Grafana/Prometheus hosts to Authentik (required for forward auth callbacks).
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-outpost
+  namespace: monitoring
+spec:
+  type: ExternalName
+  externalName: authentik-server.authentik.svc.cluster.local
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: http

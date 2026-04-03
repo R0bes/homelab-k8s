@@ -1,6 +1,5 @@
 # Subchart values (dependency name: authentik).
-#
-# Before sync: create namespace authentik and Secret authentik-bootstrap — see secret-bootstrap.example.yaml
+# Chart creates authentik + PostgreSQL secrets on install (no manual bootstrap Secret required).
 
 authentik:
   global:
@@ -9,18 +8,8 @@ authentik:
       nodeAffinity:
         type: none
 
-  authentik:
-    existingSecret:
-      secretName: authentik-bootstrap
-
   postgresql:
     enabled: true
-    auth:
-      username: authentik
-      database: authentik
-      existingSecret: authentik-bootstrap
-      secretKeys:
-        userPasswordKey: postgresql-password
 
   server:
     ingress:

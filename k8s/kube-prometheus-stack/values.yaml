@@ -1,8 +1,5 @@
 # Overrides for dependency kube-prometheus-stack (see Chart.yaml).
-# Create namespace `monitoring` and Secret `grafana-admin` before first sync:
-#   kubectl create secret generic grafana-admin -n monitoring \
-#     --from-literal=admin-user=admin \
-#     --from-literal=admin-password="$(openssl rand -base64 18)"
+# Grafana admin password is generated into a Secret by the Grafana subchart (retrieve after install if needed).
 
 kube-prometheus-stack:
   fullnameOverride: ""
@@ -28,10 +25,10 @@ kube-prometheus-stack:
 
   grafana:
     enabled: true
-    admin:
-      existingSecret: grafana-admin
-      userKey: admin-user
-      passwordKey: admin-password
+    grafana.ini:
+      server:
+        domain: grafana.robschwe.de
+        root_url: https://grafana.robschwe.de/
     ingress:
       enabled: true
       ingressClassName: traefik-helm
@@ -42,6 +39,8 @@ kube-prometheus-stack:
         traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-authentik@kubernetescrd
+        traefik.ingress.kubernetes.io/router.priority: "1"
     persistence:
       enabled: true
       type: pvc
@@ -63,7 +62,10 @@ kube-prometheus-stack:
         traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-authentik@kubernetescrd
+        traefik.ingress.kubernetes.io/router.priority: "1"
     prometheusSpec:
+      externalUrl: https://prometheus.robschwe.de
       retention: 15d
       resources:
         requests:
