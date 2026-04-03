@@ -1,0 +1,40 @@
+# Subchart values (dependency name: authentik).
+#
+# Before sync: create namespace authentik and Secret authentik-bootstrap — see secret-bootstrap.example.yaml
+
+authentik:
+  global:
+    affinity:
+      podAntiAffinity: none
+      nodeAffinity:
+        type: none
+
+  authentik:
+    existingSecret:
+      secretName: authentik-bootstrap
+
+  postgresql:
+    enabled: true
+    auth:
+      username: authentik
+      database: authentik
+      existingSecret: authentik-bootstrap
+      secretKeys:
+        userPasswordKey: postgresql-password
+
+  server:
+    ingress:
+      enabled: true
+      ingressClassName: traefik-helm
+      hosts:
+        - auth.robschwe.de
+      paths:
+        - /
+      pathType: Prefix
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+  worker:
+    replicas: 1

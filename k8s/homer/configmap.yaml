@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homer-assets
+  namespace: homer
+data:
+  config.yml: |
+    ---
+    title: Homelab
+    subtitle: Dashboard
+    logo: ""
+    header: true
+    footer: '<p>Homer · <a href="https://github.com/bastienwirtz/homer">homer</a></p>'
+    theme: default
+    colors:
+      light:
+        highlight-primary: "#3367d6"
+    services:
+      - name: Platform
+        items:
+          - name: Homepage
+            icon: fas fa-home
+            url: https://robschwe.de
+          - name: Argo CD
+            icon: fas fa-stream
+            url: https://argocd.robschwe.de
+      - name: Auth
+        items:
+          - name: Authentik
+            icon: fas fa-user-shield
+            url: https://auth.robschwe.de
+      - name: Observability
+        items:
+          - name: Grafana
+            icon: fas fa-chart-area
+            url: https://grafana.robschwe.de
+          - name: Prometheus
+            icon: fas fa-fire
+            url: https://prometheus.robschwe.de
+      - name: Demos
+        items:
+          - name: FourierFun
+            icon: fas fa-wave-square
+            url: https://fourierfun.robschwe.de
+          - name: Shader Playground
+            icon: fas fa-palette
+            url: https://shaderplayground.robschwe.de

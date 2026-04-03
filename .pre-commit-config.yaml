@@ -7,6 +7,7 @@ repos:
       - id: check-yaml
         exclude: ^k8s/homepage/templates/
       - id: check-added-large-files
+        exclude: ^k8s/.+/charts/.+\.tgz$
       - id: check-merge-conflict
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
