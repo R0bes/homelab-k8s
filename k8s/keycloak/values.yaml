@@ -4,6 +4,7 @@
 
 keycloak:
   global:
+    imageRegistry: oci.bitnami.com
     security:
       allowInsecureImages: true
 

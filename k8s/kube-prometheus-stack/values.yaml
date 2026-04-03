@@ -26,6 +26,12 @@ kube-prometheus-stack:
 
   grafana:
     enabled: true
+    securityContext:
+      runAsUser: 472
+      runAsGroup: 472
+      fsGroup: 472
+    initChownData:
+      enabled: false
     grafana.ini:
       server:
         domain: grafana.robschwe.de
